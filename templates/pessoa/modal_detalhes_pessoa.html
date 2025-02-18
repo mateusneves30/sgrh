@@ -1,0 +1,88 @@
+<div class="modal fade" id="modalDetalhesPessoa{{ pessoa.id }}" tabindex="-1"
+     aria-labelledby="modalLabel{{ pessoa.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel{{ pessoa.id }}">Detalhes
+                    de {{ pessoa.nome }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <p><strong>CPF:</strong> {{ pessoa.cpf }}</p>
+                    <p><strong>Data de
+                        Nascimento:</strong> {{ pessoa.data_nascimento.strftime('%d/%m/%Y') }}</p>
+                    <p><strong>Endereço:</strong> {{ pessoa.endereco }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="fw-bold mt-3">Profissões:</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for profissao in pessoa.profissoes %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ profissao.titulo }} - Salário:
+                                R$ {{ "%.2f"|format(profissao.salario_base) }}
+                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#modalEditarProfissao{{ profissao.id }}">
+                                    Editar
+                                </button>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item">Sem profissão cadastrada.</li>
+                        {% endfor %}
+                    </ul>
+                    <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal"
+                            data-bs-target="#modalCadastrarProfissao{{ pessoa.id }}">+ Adicionar
+                        Profissão
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="fw-bold mt-3">Capacitações:</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for capacitacao in pessoa.capacitacoes %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ capacitacao.titulo }} - {{ capacitacao.instituicao }}
+                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#modalEditarCapacitacao{{ capacitacao.id }}">
+                                    Editar
+                                </button>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item">Sem capacitações registradas.</li>
+                        {% endfor %}
+                    </ul>
+                    <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal"
+                            data-bs-target="#modalCadastrarCapacitacao{{ pessoa.id }}">+ Adicionar
+                        Capacitação
+                    </button>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="fw-bold mt-3">Folhas de Pagamento:</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for folha in pessoa.folhas_pagamento %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ folha.mes_referencia }} - Salário Bruto:
+                                R$ {{ "%.2f"|format(folha.salario_bruto) }},
+                                Desconto: R$ {{ "%.2f"|format(folha.descontos) }},
+                                Líquido: R$ {{ "%.2f"|format(folha.salario_liquido) }}
+                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#modalEditarFolha{{ folha.id }}">
+                                    Editar
+                                </button>
+                            </li>
+                        {% else %}
+                            <li class="list-group-item">Sem registros de pagamento.</li>
+                        {% endfor %}
+                    </ul>
+                    <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal"
+                            data-bs-target="#modalCadastrarFolha{{ pessoa.id }}">+ Adicionar Folha
+                        de Pagamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

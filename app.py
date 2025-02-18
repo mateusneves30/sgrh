@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from datetime import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from flask_session import Session
 from models import db, User, ProfissaoCargo, Pessoa, FolhaPgto, Capacitacao
+from routes.pessoa_routes import pessoa_bp
+from routes.profissao_routes import profissao_bp
+from routes.capacitacao_routes import capacitacao_bp
+from routes.folha_routes import folha_bp
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sgrh.db'
@@ -32,7 +35,10 @@ def load_user(user_id):
 
 @app.route('/')
 def login():
-    return render_template('login.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('lista_pessoa'))
+    else:
+        return render_template('login.html')
 
 @app.route('/autenticar', methods=['POST'])
 def autenticar():
@@ -71,29 +77,6 @@ def cadastrar():
         return redirect(url_for('login'))
     return render_template('cadastrar.html')
 
-@app.route('/editar_pessoa/<int:pessoa_id>', methods=['POST'])
-@login_required
-def editar_pessoa(pessoa_id):
-    pessoa = Pessoa.query.get_or_404(pessoa_id)
-    pessoa.nome = request.form['nome']
-    pessoa.endereco = request.form['endereco']
-
-    # Atualizar Profissões
-    profissao_ids = request.form.getlist('profissoes')
-    pessoa.profissoes = ProfissaoCargo.query.filter(ProfissaoCargo.id.in_(profissao_ids)).all()
-
-    # Atualizar Capacitações
-    capacitacao_ids = request.form.getlist('capacitacoes')
-    pessoa.capacitacoes = Capacitacao.query.filter(Capacitacao.id.in_(capacitacao_ids)).all()
-
-    # Atualizar Folhas de Pagamento
-    folha_ids = request.form.getlist('folhas_pagamento')
-    pessoa.folhas_pagamento = FolhaPgto.query.filter(FolhaPgto.id.in_(folha_ids)).all()
-
-    db.session.commit()
-    flash('Dados da pessoa atualizados com sucesso!', 'success')
-    return redirect(url_for('lista_pessoa'))
-
 @app.route('/lista_pessoa')
 @login_required
 def lista_pessoa():
@@ -130,72 +113,11 @@ def detalhes_pessoa(pessoa_id):
         ]
     })
 
-
-@app.route('/cadastrar_profissao/<int:pessoa_id>', methods=['POST'])
-@login_required
-def cadastrar_profissao(pessoa_id):
-    pessoa = Pessoa.query.get_or_404(pessoa_id)
-    titulo = request.form['titulo']
-    salario_base = request.form['salario_base']
-
-    nova_profissao = ProfissaoCargo(titulo=titulo, salario_base=salario_base, pessoa=pessoa)
-    db.session.add(nova_profissao)
-    db.session.commit()
-
-    flash(f'Profissão {titulo} adicionada com sucesso para {pessoa.nome}.', 'success')
-    return redirect(url_for('lista_pessoa'))
-
-
-@app.route('/cadastrar_capacitacao/<int:pessoa_id>', methods=['POST'])
-@login_required
-def cadastrar_capacitacao(pessoa_id):
-    pessoa = Pessoa.query.get_or_404(pessoa_id)
-    titulo = request.form['titulo']
-    instituicao = request.form['instituicao']
-    carga_horaria = request.form['carga_horaria']
-    # Converter string para objeto date
-    data_conclusao_str = request.form['data_conclusao']
-    data_conclusao = datetime.strptime(data_conclusao_str, '%Y-%m-%d').date()
-
-    nova_capacitacao = Capacitacao(
-        titulo=titulo,
-        instituicao=instituicao,
-        carga_horaria=carga_horaria,
-        data_conclusao=data_conclusao,
-        pessoa=pessoa
-    )
-    db.session.add(nova_capacitacao)
-    db.session.commit()
-
-    flash(f'Capacitação {titulo} adicionada com sucesso para {pessoa.nome}.', 'success')
-    return redirect(url_for('lista_pessoa'))
-
-
-@app.route('/cadastrar_folha/<int:pessoa_id>', methods=['POST'])
-@login_required
-def cadastrar_folha(pessoa_id):
-    pessoa = Pessoa.query.get_or_404(pessoa_id)
-    mes_referencia = request.form['mes_referencia']
-    salario_bruto = float(request.form['salario_bruto'])
-    descontos = float(request.form['descontos'])
-
-    salario_liquido = salario_bruto - descontos
-
-    # Criar a folha de pagamento sem associar diretamente a pessoa
-    nova_folha = FolhaPgto(
-        mes_referencia=mes_referencia,
-        salario_bruto=salario_bruto,
-        descontos=descontos,
-        salario_liquido=salario_liquido
-    )
-    db.session.add(nova_folha)
-
-    # Depois, adicionar a pessoa à relação N:N
-    nova_folha.pessoas.append(pessoa)
-    db.session.commit()
-
-    flash(f'Folha de pagamento para {mes_referencia} adicionada com sucesso para {pessoa.nome}.', 'success')
-    return redirect(url_for('lista_pessoa'))
+# Registrar os Blueprints
+app.register_blueprint(pessoa_bp)
+app.register_blueprint(profissao_bp)
+app.register_blueprint(capacitacao_bp)
+app.register_blueprint(folha_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,38 @@
+<div class="modal fade" id="modalEditarCapacitacao{{ capacitacao.id }}" tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Capacitação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('capacitacao.editar_capacitacao', capacitacao_id=capacitacao.id) }}"
+                      method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control" name="titulo"
+                               value="{{ capacitacao.titulo }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Instituição</label>
+                        <input type="text" class="form-control" name="instituicao"
+                               value="{{ capacitacao.instituicao }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Carga Horária</label>
+                        <input type="number" class="form-control" name="carga_horaria"
+                               value="{{ capacitacao.carga_horaria }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Conclusão</label>
+                        <input type="date" class="form-control" name="data_conclusao"
+                               value="{{ capacitacao.data_conclusao }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

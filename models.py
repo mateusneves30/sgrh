@@ -40,10 +40,10 @@ pessoa_folha_pagamento = db.Table(
 class Pessoa(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    cpf = db.Column(db.String(14), unique=True, nullable=False)
+    cpf = db.Column(db.Integer, unique=True, nullable=False)
     data_nascimento = db.Column(db.Date, nullable=False)
     endereco = db.Column(db.String(200), nullable=True)
-    telefone = db.Column(db.String(20), nullable=True)
+    telefone = db.Column(db.Integer, nullable=True)
 
     # Relacionamento 1:N (Uma pessoa pode ter várias profissões, mas cada profissão pertence a uma pessoa)
     profissoes = db.relationship('ProfissaoCargo', back_populates='pessoa', cascade="all, delete-orphan")
