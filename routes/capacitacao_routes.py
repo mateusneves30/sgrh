@@ -44,9 +44,9 @@ def editar_capacitacao(capacitacao_id):
     flash('Capacitação editada com sucesso!', 'success')
     return redirect(url_for('lista_pessoa'))
 
-@capacitacao_bp.route('/remover_capacitacao/<int:capacitacao_id>', methods=['POST'])
+@capacitacao_bp.route('/deletar_capacitacao/<int:capacitacao_id>', methods=['POST'])
 @login_required
-def remover_capacitacao(capacitacao_id):
+def deletar_capacitacao(capacitacao_id):
     capacitacao = Capacitacao.query.get_or_404(capacitacao_id)
     db.session.delete(capacitacao)
     db.session.commit()

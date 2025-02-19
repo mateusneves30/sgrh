@@ -29,9 +29,9 @@ def editar_profissao(profissao_id):
     flash('Profissão editada com sucesso!', 'success')
     return redirect(url_for('lista_pessoa'))
 
-@profissao_bp.route('/remover_profissao/<int:profissao_id>', methods=['POST'])
+@profissao_bp.route('/deletar_profissao/<int:profissao_id>', methods=['POST'])
 @login_required
-def remover_profissao(profissao_id):
+def deletar_profissao(profissao_id):
     profissao = ProfissaoCargo.query.get_or_404(profissao_id)
     db.session.delete(profissao)
     db.session.commit()

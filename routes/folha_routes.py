@@ -40,9 +40,9 @@ def editar_folha(folha_id):
     flash('Folha de pagamento editada com sucesso!', 'success')
     return redirect(url_for('lista_pessoa'))
 
-@folha_bp.route('/remover_folha/<int:folha_id>', methods=['POST'])
+@folha_bp.route('/deletar_folha/<int:folha_id>', methods=['POST'])
 @login_required
-def remover_folha(folha_id):
+def deletar_folha(folha_id):
     folha = FolhaPgto.query.get_or_404(folha_id)
     db.session.delete(folha)
     db.session.commit()

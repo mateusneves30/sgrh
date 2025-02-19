@@ -1,7 +1,7 @@
 from flask import Blueprint, request, redirect, url_for, flash, jsonify
 from datetime import datetime
 from flask_login import login_required
-from models import db, ProfissaoCargo, Pessoa
+from models import db, Pessoa
 
 pessoa_bp = Blueprint('pessoa', __name__)
 
@@ -55,11 +55,26 @@ def editar_pessoa(pessoa_id):
     flash('Dados da pessoa atualizados com sucesso!', 'success')
     return redirect(url_for('lista_pessoa'))
 
-@pessoa_bp.route('/remover_pessoa/<int:profissao_id>', methods=['POST'])
+@pessoa_bp.route('/deletar_pessoa/<int:pessoa_id>', methods=['POST'])
 @login_required
-def remover_profissao(profissao_id):
-    profissao = ProfissaoCargo.query.get_or_404(profissao_id)
-    db.session.delete(profissao)
+def deletar_pessoa(pessoa_id):
+    pessoa = Pessoa.query.get_or_404(pessoa_id)
+    nome = pessoa.nome
+
+    # Remover relações N:N (folhas de pagamento) e deletar folhas de pagamento associadas
+    for folha in pessoa.folhas_pagamento:
+        db.session.delete(folha)
+
+    # Remover relações 1:N (profissões e capacitações)
+    for profissao in pessoa.profissoes:
+        db.session.delete(profissao)
+
+    for capacitacao in pessoa.capacitacoes:
+        db.session.delete(capacitacao)
+
+    # Remover a pessoa
+    db.session.delete(pessoa)
     db.session.commit()
-    flash('Profissão removida com sucesso!', 'success')
+
+    flash(f'{nome} removido(a) com sucesso!', 'success')
     return redirect(url_for('lista_pessoa'))
